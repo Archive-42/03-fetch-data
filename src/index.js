@@ -1,20 +1,33 @@
-import { html } from "lit-html";
-import { component, useState, useEffect } from "haunted";
+import { LitElement, html } from "lit-element";
 
-function FetchData() {
-  const [name, setName] = useState("");
+class FetchingData extends LitElement {
+  static get properties() {
+    return {
+      response: { type: Array },
+    };
+  }
 
-  useEffect(async () => {
-    const response = await fetch("https://swapi.co/api/people/1");
-    const responseAsJson = await response.json();
-    setName(responseAsJson.name);
-  }, []);
+  constructor() {
+    super();
+    this.response = [];
+  }
 
-  return html`
-    <div>
-      ${name}
-    </div>
-  `;
+  firstUpdated() {
+    fetch("https://swapi.dev/api/people/")
+      .then((r) => r.json())
+      .then((r) => {
+        this.response = r.results;
+      });
+  }
+
+  render() {
+    const { response } = this;
+    return html`
+      <ul>
+        ${response.map((item) => html` <li>${item.name}</li> `)}
+      </ul>
+    `;
+  }
 }
 
-customElements.define("fetch-data", component(FetchData));
+customElements.define("fetching-data", FetchingData);
